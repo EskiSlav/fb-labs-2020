@@ -117,13 +117,13 @@ def print_letters_list(letters_list: List[ Tuple[str, int] ]) -> None:
             probabiliies.append(percentage * math.log2(percentage))
         except ValueError:
             probabiliies.append(0)
-        logging.info("{letter}: {value:5}, {percentage:.5%}".format(
+        logging.info("{letter}: {value:6}, {percentage:2.5%}".format(
             letter=letter, value=value, percentage=percentage))
     h = -1 * sum(probabiliies)
     r = 1 - h / len(letters_list)
-    logging.info("--- Enthropy: {}, Redundancy {} ---".format(h, r))
+    logging.info("---\nEnthropy: {}\n Redundancy: {}\n---".format(h, r))
 
-def most_used_letters(letters: Dict) -> None:
+def most_used_letters(letters: Dict[str, int]) -> None:
     "print list sorted by most used letters"
     l = list(letters.items())
     l.sort(key=lambda x: x[1])
@@ -131,14 +131,14 @@ def most_used_letters(letters: Dict) -> None:
     print_letters_list(l)
 
 
-def less_used_letters(letters: Dict) -> None:
+def less_used_letters(letters: Dict[str, int]) -> None:
     "Print list sorted by less used letters"
     l = list(letters.items())
     l.sort(key=lambda x: x[1])
     print_letters_list(l)
 
 
-def sorted_by_letter(letters: Dict) -> None:
+def sorted_by_letter(letters: Dict[str, int]) -> None:
     "Print list sorted by letters"
     l = list(letters.items())
     l.sort(key=lambda x: x[0])
@@ -168,39 +168,39 @@ def print_bigrams(bigrams: List[List[int]], letters: Dict) -> None:
 
     h = -1 * sum(probabiliies) / 2
     r = 1 - h / len(letters_list)
-    logging.info("--- Enthropy: {}, Redundancy {} ---".format(h, r))
+    logging.info("---\nEnthropy: {}\n Redundancy: {}\n---".format(h, r))
 
 
 
-def run_interactive_mode():
-    while True:
-        print(
-            "1. Print most used characters\n"
-            "2. Print less used characters\n"
-            "3. Print sorted by letter\n"
-            "4. Print bigrams\n"
-            "0. Exit\n"
-        )
+# def run_interactive_mode():
+#     while True:
+#         print(
+#             "1. Print most used characters\n"
+#             "2. Print less used characters\n"
+#             "3. Print sorted by letter\n"
+#             "4. Print bigrams\n"
+#             "0. Exit\n"
+#         )
 
-        try:
-            choice = int(input("Enter number: "))
-        except ValueError:
-            logging.error("Enter numbers only!")
-            continue
+#         try:
+#             choice = int(input("Enter number: "))
+#         except ValueError:
+#             logging.error("Enter numbers only!")
+#             continue
 
-        os.system("clear")
+#         os.system("clear")
 
-        if choice == 1:
-            most_used_letters(letters)
-        elif choice == 2:
-            less_used_letters(letters)
-        elif choice == 3:
-            sorted_by_letter(letters)
-        elif choice == 4:
-            print_bigrams(bigrams)
+#         if choice == 1:
+#             most_used_letters(letters)
+#         elif choice == 2:
+#             less_used_letters(letters)
+#         elif choice == 3:
+#             sorted_by_letter(letters)
+#         elif choice == 4:
+#             print_bigrams(bigrams)
             
-        elif choice == 0:
-            break
+#         elif choice == 0:
+#             break
 
 def create_report(input_file: str):
     global letters, letters_with_space, letters_with_space_list, letters_list
@@ -217,12 +217,6 @@ def create_report(input_file: str):
 
     most_used_letters(letters)
     most_used_letters(letters_with_space)
-
-    less_used_letters(letters)
-    less_used_letters(letters_with_space)
-    
-    sorted_by_letter(letters)
-    sorted_by_letter(letters_with_space)
     
     letters_with_space_list = [ l for l in "".join(letters_with_space_list).replace(" ", "_") ]
 
@@ -247,7 +241,8 @@ if __name__ == '__main__':
         file_name = "anna.txt"
 
     if '-i' in argv:
-        run_interactive_mode()
+        pass
+        # run_interactive_mode()
     else:
         create_report(file_name)
     
