@@ -121,7 +121,7 @@ def print_letters_list(letters_list: List[ Tuple[str, int] ]) -> None:
             letter=letter, value=value, percentage=percentage))
     h = -1 * sum(probabiliies)
     r = 1 - h / len(letters_list)
-    logging.info("---\nEnthropy: {}\n Redundancy: {}\n---".format(h, r))
+    logging.info("---\nEntropy: {}\n Redundancy: {}\n---".format(h, r))
 
 def most_used_letters(letters: Dict[str, int]) -> None:
     "print list sorted by most used letters"
@@ -149,26 +149,28 @@ def print_bigrams(bigrams: List[List[int]], letters: Dict) -> None:
 
     probabiliies = []
     sum_of_bigrams_value = 0
-    l = " {:5}" * len(letters)
-    logging.info("    " + l.format(*letters))
+    l = " {:^7}" * len(letters)
+    logging.info("   " + l.format(*letters))
 
     for row in bigrams:
         for value in row:
             sum_of_bigrams_value += value
 
     for letter, row in zip(letters, bigrams):
+        percentage_row = []
         for value in row:
             percentage = value / sum_of_bigrams_value
+            percentage_row.append(percentage)
             try:
                 probabiliies.append(percentage * math.log2(percentage))
             except ValueError:
                 probabiliies.append(0)
-        s = "{} " + " {:5}" * len(row)
-        logging.info(s.format(letter, *row))
+        s = "{} " + " {:.4%}" * len(percentage_row)
+        logging.info(s.format(letter, *percentage_row))
 
     h = -1 * sum(probabiliies) / 2
     r = 1 - h / len(letters_list)
-    logging.info("---\nEnthropy: {}\n Redundancy: {}\n---".format(h, r))
+    logging.info("--- Entropy: {}, Redundancy: {} ---".format(h, r))
 
 
 
