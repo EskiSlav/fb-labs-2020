@@ -1,0 +1,253 @@
+import os
+from sys import stdout, argv
+from pathlib import Path
+from pprint import pprint
+from typing import Dict, List, Tuple
+import logging
+import math
+
+sh = logging.StreamHandler(stdout)
+fh = logging.FileHandler('report.txt', 'w') 
+logging.basicConfig(level=logging.INFO, format="%(message)s", handlers=(sh, fh))
+
+letters = {
+    'а': 0, 'б': 0, 'в': 0, 'г': 0, 'д': 0, 'е': 0, 'ё': 0, 'ж': 0,
+    'з': 0, 'и': 0, 'й': 0, 'к': 0, 'л': 0, 'м': 0, 'н': 0, 'о': 0,
+    'п': 0, 'р': 0, 'с': 0, 'т': 0, 'у': 0, 'ф': 0, 'х': 0, 'ц': 0,
+    'ч': 0, 'ш': 0, 'щ': 0, 'ъ': 0, 'ы': 0, 'ь': 0, 'э': 0, 'ю': 0,
+    'я': 0
+}
+letters_with_space = {
+    'а': 0, 'б': 0, 'в': 0, 'г': 0, 'д': 0, 'е': 0, 'ё': 0, 'ж': 0,
+    'з': 0, 'и': 0, 'й': 0, 'к': 0, 'л': 0, 'м': 0, 'н': 0, 'о': 0,
+    'п': 0, 'р': 0, 'с': 0, 'т': 0, 'у': 0, 'ф': 0, 'х': 0, 'ц': 0,
+    'ч': 0, 'ш': 0, 'щ': 0, 'ъ': 0, 'ы': 0, 'ь': 0, 'э': 0, 'ю': 0,
+    'я': 0, ' ': 0
+}
+letters_list = sorted([ letter for letter in letters])
+letters_with_space_list = sorted([ letter for letter in letters_with_space])
+
+
+def remove_redundant_chars(text: str, with_spaces: bool=True) -> str:
+    new_str = ""
+    for letter in text:
+        if letter in letters:
+            new_str += letter
+
+    return new_text
+
+#list of used letters
+letters_list = sorted([ letter for letter in letters ])
+
+
+
+def get_filtered_text_from_file(file_name: str, with_spaces: bool=True) -> str:     
+    logging.info("Opening file {}".format(file_name))
+    try:
+        with open(file_name) as f:
+            # read all text to variable
+            logging.info("Reading text from file {}".format(file_name))
+            text = f.read()
+    except (NameError, FileNotFoundError):
+        logging.error("Could not open file... Exiting...")
+        exit()
+
+    logging.info("Lowering text from file {}".format(file_name))
+    lowered_text = text.lower()
+    
+    # filter characters
+    filtered_text = ""
+    if with_spaces:
+        for letter in lowered_text:
+            if letter in letters_with_space:
+                filtered_text += letter
+            elif letter == '\n':
+                filtered_text += ' '
+    else:
+        for letter in lowered_text:
+            if letter in letters:
+                filtered_text += letter
+
+    logging.info("Replacing spaces")
+
+    while not filtered_text.find("  ") == -1:
+        filtered_text = filtered_text.replace("  ", " ")
+
+    return filtered_text
+
+
+
+def count_letters(text: str, letters: Dict[str, int]) -> None:
+    # count all letters
+    logging.info("Counting letters ...")
+    for letter in text:
+        try: 
+            letters[letter.lower()] += 1
+        except KeyError:
+            pass
+
+def count_bigrams(text: str, letters: Dict[str, int],
+                  intersected: bool=True) -> List[List[int]]:
+    step = 1
+    logging.info("Counting bigrams ...")
+    if intersected == False:
+        step = 2
+
+    #empty matrix of bigram occurances
+    bigrams = [ [ 0 for _ in letters ] for _ in letters ]
+
+    for i in range(0, len(text) - 1, step):
+        letter1, letter2 = text[i:i+2]
+
+        # enumerate every letter like - 'a': 1, 'b': 2
+        ledict = { letter: i for letter, i in zip(letters, range(len(letters))) }
+        
+        bigrams[ledict[letter1]][ledict[letter2]] += 1
+
+    return bigrams
+
+
+def print_letters_list(letters_list: List[ Tuple[str, int] ]) -> None:
+    sum_of_letters_value = sum( [ value for _, value in letters_list ] )
+    probabiliies = []
+    logging.info("   count  percentage")
+    for letter, value in letters_list:
+        percentage = value / sum_of_letters_value
+        try:
+            probabiliies.append(percentage * math.log2(percentage))
+        except ValueError:
+            probabiliies.append(0)
+        logging.info("{letter}: {value:5}, {percentage:.5%}".format(
+            letter=letter, value=value, percentage=percentage))
+    h = -1 * sum(probabiliies)
+    r = 1 - h / len(letters_list)
+    logging.info("--- Enthropy: {}, Redundancy {} ---".format(h, r))
+
+def most_used_letters(letters: Dict) -> None:
+    "print list sorted by most used letters"
+    l = list(letters.items())
+    l.sort(key=lambda x: x[1])
+    l.reverse()
+    print_letters_list(l)
+
+
+def less_used_letters(letters: Dict) -> None:
+    "Print list sorted by less used letters"
+    l = list(letters.items())
+    l.sort(key=lambda x: x[1])
+    print_letters_list(l)
+
+
+def sorted_by_letter(letters: Dict) -> None:
+    "Print list sorted by letters"
+    l = list(letters.items())
+    l.sort(key=lambda x: x[0])
+    print_letters_list(l)
+
+
+def print_bigrams(bigrams: List[List[int]], letters: Dict) -> None:
+
+    probabiliies = []
+    sum_of_bigrams_value = 0
+    l = " {:5}" * len(letters)
+    logging.info("    " + l.format(*letters))
+
+    for row in bigrams:
+        for value in row:
+            sum_of_bigrams_value += value
+
+    for letter, row in zip(letters, bigrams):
+        for value in row:
+            percentage = value / sum_of_bigrams_value
+            try:
+                probabiliies.append(percentage * math.log2(percentage))
+            except ValueError:
+                probabiliies.append(0)
+        s = "{} " + " {:5}" * len(row)
+        logging.info(s.format(letter, *row))
+
+    h = -1 * sum(probabiliies) / 2
+    r = 1 - h / len(letters_list)
+    logging.info("--- Enthropy: {}, Redundancy {} ---".format(h, r))
+
+
+
+def run_interactive_mode():
+    while True:
+        print(
+            "1. Print most used characters\n"
+            "2. Print less used characters\n"
+            "3. Print sorted by letter\n"
+            "4. Print bigrams\n"
+            "0. Exit\n"
+        )
+
+        try:
+            choice = int(input("Enter number: "))
+        except ValueError:
+            logging.error("Enter numbers only!")
+            continue
+
+        os.system("clear")
+
+        if choice == 1:
+            most_used_letters(letters)
+        elif choice == 2:
+            less_used_letters(letters)
+        elif choice == 3:
+            sorted_by_letter(letters)
+        elif choice == 4:
+            print_bigrams(bigrams)
+            
+        elif choice == 0:
+            break
+
+def create_report(input_file: str):
+    global letters, letters_with_space, letters_with_space_list, letters_list
+    text_with_spaces = get_filtered_text_from_file(file_name)
+    text = get_filtered_text_from_file(file_name, False)
+
+    count_letters(text_with_spaces, letters_with_space)
+    count_letters(text, letters)
+
+    bigrams_with_spaces_intersected = count_bigrams(text_with_spaces, letters_with_space_list)
+    bigrams_intersected = count_bigrams(text, letters_list)
+    bigrams_with_spaces = count_bigrams(text_with_spaces, letters_with_space_list, False)
+    bigrams = count_bigrams(text, letters_list, False)
+
+    most_used_letters(letters)
+    most_used_letters(letters_with_space)
+
+    less_used_letters(letters)
+    less_used_letters(letters_with_space)
+    
+    sorted_by_letter(letters)
+    sorted_by_letter(letters_with_space)
+    
+    letters_with_space_list = [ l for l in "".join(letters_with_space_list).replace(" ", "_") ]
+
+    logging.info("--- Bigrams with spaces intersected ---")
+    print_bigrams(bigrams_with_spaces_intersected, letters_with_space_list)
+
+    logging.info("--- Bigrams without spaces intersected ---")
+    print_bigrams(bigrams_intersected, letters_list)
+
+    logging.info("--- Bigrams with spaces not-intersected ---")
+    print_bigrams(bigrams_with_spaces, letters_with_space_list)
+
+    logging.info("--- Bigrams without spaces not-intersected ---")
+    print_bigrams(bigrams, letters_list)
+
+
+if __name__ == '__main__':
+    
+    file_name = None
+    file_name = input("Enter file name (file[.txt]): ")
+    if file_name == "":
+        file_name = "anna.txt"
+
+    if '-i' in argv:
+        run_interactive_mode()
+    else:
+        create_report(file_name)
+    
