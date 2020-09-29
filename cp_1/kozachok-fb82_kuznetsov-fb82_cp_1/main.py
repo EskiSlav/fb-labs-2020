@@ -24,21 +24,9 @@ letters_with_space = {
     'ч': 0, 'ш': 0, 'щ': 0, 'ъ': 0, 'ы': 0, 'ь': 0, 'э': 0, 'ю': 0,
     'я': 0, ' ': 0
 }
+
 letters_list = sorted([ letter for letter in letters])
 letters_with_space_list = sorted([ letter for letter in letters_with_space])
-
-
-def remove_redundant_chars(text: str, with_spaces: bool=True) -> str:
-    new_str = ""
-    for letter in text:
-        if letter in letters:
-            new_str += letter
-
-    return new_text
-
-#list of used letters
-letters_list = sorted([ letter for letter in letters ])
-
 
 
 def get_filtered_text_from_file(file_name: str, with_spaces: bool=True) -> str:     
@@ -120,7 +108,7 @@ def print_letters_list(letters_list: List[ Tuple[str, int] ]) -> None:
         logging.info("{letter}: {value:6}, {percentage:2.5%}".format(
             letter=letter, value=value, percentage=percentage))
     h = -1 * sum(probabiliies)
-    r = 1 - h / len(letters_list)
+    r = 1 - h / math.log2(len(letters_list))
     logging.info("---\nEntropy: {}\n Redundancy: {}\n---".format(h, r))
 
 def most_used_letters(letters: Dict[str, int]) -> None:
@@ -169,7 +157,7 @@ def print_bigrams(bigrams: List[List[int]], letters: Dict) -> None:
         logging.info(s.format(letter, *percentage_row))
 
     h = -1 * sum(probabiliies) / 2
-    r = 1 - h / len(letters_list)
+    r = 1 - h / math.log2(len(letters_list))
     logging.info("--- Entropy: {}, Redundancy: {} ---".format(h, r))
 
 
