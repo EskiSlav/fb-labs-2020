@@ -66,7 +66,7 @@ def get_filtered_text_from_file(file_name: str, with_spaces: bool=True) -> str:
 
 
 def count_letters(text: str, letters: Dict[str, int]) -> None:
-    # count all letters
+    "Count all letters and write count in 'letters' dict"
     logging.info("Counting letters ...")
     for letter in text:
         try: 
@@ -76,12 +76,21 @@ def count_letters(text: str, letters: Dict[str, int]) -> None:
 
 def count_bigrams(text: str, letters: Dict[str, int],
                   intersected: bool=True) -> List[List[int]]:
+    """
+    Count bigrams in matrix 
+    [0, 5, 0, ...]
+    [4, 0, 7, ...]
+    [0, 8, 0, ...]
+    ...
+
+    :return: matrix
+    """
     step = 1
     logging.info("Counting bigrams ...")
     if intersected == False:
         step = 2
 
-    #empty matrix of bigram occurances
+    # fill matrix with 0
     bigrams = [ [ 0 for _ in letters ] for _ in letters ]
 
     for i in range(0, len(text) - 1, step):
@@ -96,6 +105,7 @@ def count_bigrams(text: str, letters: Dict[str, int],
 
 
 def print_letters_list(letters_list: List[ Tuple[str, int] ]) -> None:
+    "Print statistics of monograms with entropy and redundancy"
     sum_of_letters_value = sum( [ value for _, value in letters_list ] )
     probabiliies = []
     logging.info("   count  percentage")
@@ -134,7 +144,7 @@ def sorted_by_letter(letters: Dict[str, int]) -> None:
 
 
 def print_bigrams(bigrams: List[List[int]], letters: Dict) -> None:
-
+    "Print bigram statisctics with entropy and redundancy"
     probabiliies = []
     sum_of_bigrams_value = 0
     l = " {:^7}" * len(letters)
@@ -160,37 +170,6 @@ def print_bigrams(bigrams: List[List[int]], letters: Dict) -> None:
     r = 1 - h / math.log2(len(letters_list))
     logging.info("--- Entropy: {}, Redundancy: {} ---".format(h, r))
 
-
-
-# def run_interactive_mode():
-#     while True:
-#         print(
-#             "1. Print most used characters\n"
-#             "2. Print less used characters\n"
-#             "3. Print sorted by letter\n"
-#             "4. Print bigrams\n"
-#             "0. Exit\n"
-#         )
-
-#         try:
-#             choice = int(input("Enter number: "))
-#         except ValueError:
-#             logging.error("Enter numbers only!")
-#             continue
-
-#         os.system("clear")
-
-#         if choice == 1:
-#             most_used_letters(letters)
-#         elif choice == 2:
-#             less_used_letters(letters)
-#         elif choice == 3:
-#             sorted_by_letter(letters)
-#         elif choice == 4:
-#             print_bigrams(bigrams)
-            
-#         elif choice == 0:
-#             break
 
 def create_report(input_file: str):
     global letters, letters_with_space, letters_with_space_list, letters_list
@@ -230,9 +209,5 @@ if __name__ == '__main__':
     if file_name == "":
         file_name = "anna.txt"
 
-    if '-i' in argv:
-        pass
-        # run_interactive_mode()
-    else:
-        create_report(file_name)
+    create_report(file_name)
     
