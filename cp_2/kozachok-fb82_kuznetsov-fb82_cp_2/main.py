@@ -108,7 +108,7 @@ class Vigenere():
             l = len(Y)
             I = summ / (l * (l - 1))
             Indices[r] = I
-            print("Key length: {r}, I: {I:3>}".format(r=r, I=str(I)) )
+            print("Key length: {r}, Index: {I:3>}".format(r=r, I=str(I)) )
 
         general_key = ""
         key_len = 17 # хардкод длинны ключа
@@ -120,7 +120,7 @@ class Vigenere():
             open_letter = Vigenere.n_l[k]
             general_key += open_letter
 
-        print(general_key)
+        print("Cracked_key:", general_key)
         return general_key
 
         logging.info("Pass more text to get more accurate result")
@@ -129,20 +129,20 @@ class Vigenere():
 if __name__ == '__main__':
 
     # тест на анне карениной
-    plaintext = myopentext_anna_f.read()
-    obj = Vigenere(plaintext, key="приветмир")
-    print( (enc:=obj.encrypt())[:100], '\n')
-    obj = Vigenere(enc, key="приветмир")
-    print("DECRYPTION...\n", obj.decrypt()[:100])
+    # plaintext = myopentext_anna_f.read()
+    # obj = Vigenere(plaintext, key="приветмир")
+    # print( (enc:=obj.encrypt())[:100], '\n')
+    # obj = Vigenere(enc, key="приветмир")
+    # print("DECRYPTION...\n", obj.decrypt()[:100])
 
-    obj = Vigenere(enc)
-    obj.crack()
+    # obj = Vigenere(enc)
+    # obj.crack()
 
 
-    # ciphertext = ciphertext_f.read()
+    ciphertext = ciphertext_f.read()
     
-    # ve_obj = Vigenere(ciphertext)
-    # key = ve_obj.crack()
+    ve_obj = Vigenere(ciphertext)
+    key = ve_obj.crack()
     
     # print('боаяамахчэндшпиль')
     # ve_obj = Vigenere(ciphertext, key='боаяамахчэндшпиль')
