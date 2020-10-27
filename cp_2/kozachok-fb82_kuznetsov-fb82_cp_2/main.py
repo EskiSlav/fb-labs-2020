@@ -2,7 +2,7 @@ from typing import List, Dict, Tuple, IO, Any
 from sys import stdout
 from collections import Counter
 import logging
-
+from pprint import pprint
 sh = logging.StreamHandler(stdout)
 fh = logging.FileHandler('report.txt', 'w') 
 logging.basicConfig(level=logging.INFO, format="%(message)s", handlers=(sh, fh))
@@ -10,6 +10,7 @@ logging.basicConfig(level=logging.INFO, format="%(message)s", handlers=(sh, fh))
 ciphertext_f = open('./cp_2/kozachok-fb82_kuznetsov-fb82_cp_2/ciphertext.txt', 'r')
 ciphertext_v10_f = open('./cp_2/kozachok-fb82_kuznetsov-fb82_cp_2/ciphertext_v10.txt', 'r')
 
+most_used_letters = [ 'о','е','а','н','и','т','с','л','в','р','к','д','м','у','п','я','ь','ы','г','б','ч','з','ж','й','ш','х','ю','э','щ','ц','ф','ъ','ё']
 myopentext_f = open('./cp_2/kozachok-fb82_kuznetsov-fb82_cp_2/myopentext.txt', 'r')
 
 
@@ -22,7 +23,10 @@ class Vigenere():
 
     def __init__(self, text: str=None, f: IO[Any]=None, key: str=None):
         self.key = key
-        self.text = text
+        try:
+            self.text = self.filter_text(text.lower())
+        except TypeError:
+            self.text = None
         self.f = f
 
     def check_crypt(self) -> bool:
@@ -91,19 +95,9 @@ class Vigenere():
     def crack(self) -> str:
         if not self.check_crack():
             return
-        
-        self.text = self.filter_text(self.text)
 
         Indices = {}
-        # Y = []
-
-        # for r in [2,3,4,5,10,11,12,13,14,15,16,17,18,19,20]:
-        #     Y = []
-        #     for i in range(r+1):
-        #         Y.append([])
-        #         for letter in range(i, len(self.text), r):
-        #             Y[i].append(letter)
-        # [2,3,4,5,10,11,12,13,14,15,16,17,18,19,20]
+        
         for r in range(2, 35):
             Y =  self.text[::r] 
             letter_number = Counter(Y)
@@ -115,27 +109,13 @@ class Vigenere():
             Indices[r] = I
             print("Key length: {r}, I: {I:3>}".format(r=r, I=str(I)) )
 
-        # def find_max_I(indices: dict) -> Tuple:
-        #     key_len = list(indices.keys())[0]
-        #     I = list(indices.values())[0]
-        #     for key_len_v, I_v in indices.items():
-        #         if I < I_v:
-        #             key_len = key_len_v
-        #             I = I_v
-            
-        #     return (key_len, I)
-
-        # key_len, _ = find_max_I(Indices)
-        # print("Max:", max(Indices))
-        # n - length of plaintext
-        # m - number of letters
         general_key = ""
         key_len = 17
         for i in range(key_len):
             Yi = self.text[i::key_len]
             letter = Counter(Yi).most_common(1)[0][0]
             int_let = Vigenere.l_n[letter]
-            k = (int_let - key_len) % len(Vigenere.l_n)
+            k = (int_let - Vigenere.l_n[most_used_letters[0]]) % len(Vigenere.l_n)
             open_letter = Vigenere.n_l[k]
             general_key += open_letter
 
@@ -144,20 +124,24 @@ class Vigenere():
 
         logging.info("Pass more text to get more accurate result")
 
-
-
         
 if __name__ == '__main__':
-    # ve_obj = Vigenere(f=myopentext_f, key="сашалюбитславика")
-    # ciphertext = ve_obj.encrypt()
-    # vd_obj = Vigenere(ciphertext, key='сашалюбитславика')
-    # cleartext = vd_obj.decrypt()
+    # plaintext = myopentext_f.read()
+    # obj = Vigenere(plaintext, key="приветмир")
+    # print( (enc:=obj.encrypt()), '\n')
+    # obj = Vigenere(enc, key="приветмир")
+    # print("DECRYPTION...\n", obj.decrypt())
+
+    # obj = Vigenere(enc)
+    # obj.crack()
     ciphertext = ciphertext_f.read()
-    ve_obj = Vigenere(ciphertext)
-    key = ve_obj.crack()
-    # key_hard = 'вжжягвжвегз'
-    ve_obj = Vigenere(ciphertext, key=key)
+    # ve_obj = Vigenere(ciphertext)
+    # key = ve_obj.crack()
+    # pprint(Vigenere.l_n)
+    print('ноаяамахчэндшпиль')
+    ve_obj = Vigenere(ciphertext, key='ноаяамахчэндшпиль')
     print(ve_obj.decrypt())
+    
 
 
 
