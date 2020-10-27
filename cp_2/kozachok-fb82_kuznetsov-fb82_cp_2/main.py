@@ -12,7 +12,7 @@ ciphertext_v10_f = open('./cp_2/kozachok-fb82_kuznetsov-fb82_cp_2/ciphertext_v10
 
 most_used_letters = [ 'о','е','а','н','и','т','с','л','в','р','к','д','м','у','п','я','ь','ы','г','б','ч','з','ж','й','ш','х','ю','э','щ','ц','ф','ъ','ё']
 myopentext_f = open('./cp_2/kozachok-fb82_kuznetsov-fb82_cp_2/myopentext.txt', 'r')
-
+myopentext_anna_f = open('./cp_2/kozachok-fb82_kuznetsov-fb82_cp_2/anna.txt', 'r')
 
 class Vigenere():
 
@@ -98,6 +98,7 @@ class Vigenere():
 
         Indices = {}
         
+        # Подсчёт индексов
         for r in range(2, 35):
             Y =  self.text[::r] 
             letter_number = Counter(Y)
@@ -110,7 +111,7 @@ class Vigenere():
             print("Key length: {r}, I: {I:3>}".format(r=r, I=str(I)) )
 
         general_key = ""
-        key_len = 17
+        key_len = 17 # хардкод длинны ключа
         for i in range(key_len):
             Yi = self.text[i::key_len]
             letter = Counter(Yi).most_common(1)[0][0]
@@ -126,21 +127,26 @@ class Vigenere():
 
         
 if __name__ == '__main__':
-    # plaintext = myopentext_f.read()
-    # obj = Vigenere(plaintext, key="приветмир")
-    # print( (enc:=obj.encrypt()), '\n')
-    # obj = Vigenere(enc, key="приветмир")
-    # print("DECRYPTION...\n", obj.decrypt())
 
-    # obj = Vigenere(enc)
-    # obj.crack()
-    ciphertext = ciphertext_f.read()
+    # тест на анне карениной
+    plaintext = myopentext_anna_f.read()
+    obj = Vigenere(plaintext, key="приветмир")
+    print( (enc:=obj.encrypt())[:100], '\n')
+    obj = Vigenere(enc, key="приветмир")
+    print("DECRYPTION...\n", obj.decrypt()[:100])
+
+    obj = Vigenere(enc)
+    obj.crack()
+
+
+    # ciphertext = ciphertext_f.read()
+    
     # ve_obj = Vigenere(ciphertext)
     # key = ve_obj.crack()
-    # pprint(Vigenere.l_n)
-    print('ноаяамахчэндшпиль')
-    ve_obj = Vigenere(ciphertext, key='ноаяамахчэндшпиль')
-    print(ve_obj.decrypt())
+    
+    # print('боаяамахчэндшпиль')
+    # ve_obj = Vigenere(ciphertext, key='боаяамахчэндшпиль')
+    # print(ve_obj.decrypt())
     
 
 
