@@ -92,10 +92,7 @@ class Vigenere():
 
         return self.__proc_text('d')
 
-    def crack(self) -> str:
-        if not self.check_crack():
-            return
-
+    def count_indicies(self) -> None:
         Indices = {}
         
         # Подсчёт индексов
@@ -108,10 +105,18 @@ class Vigenere():
             l = len(Y)
             I = summ / (l * (l - 1))
             Indices[r] = I
+
+        sIndices = sorted(list(Indices.items()), key=lambda x: x[1], reverse=True)
+        for r, I in sIndices:
             print("Key length: {r}, Index: {I:3>}".format(r=r, I=str(I)) )
 
+
+
+    def crack(self, key_len: int) -> str:
+        if not self.check_crack():
+            return
+
         general_key = ""
-        key_len = 17 # хардкод длинны ключа
         for i in range(key_len):
             Yi = self.text[i::key_len]
             letter = Counter(Yi).most_common(1)[0][0]
@@ -128,7 +133,7 @@ class Vigenere():
         
 if __name__ == '__main__':
 
-    # тест на анне карениной
+    # --- TEST WITH ANNA KARENINA ---
     # plaintext = myopentext_anna_f.read()
     # obj = Vigenere(plaintext, key="приветмир")
     # print( (enc:=obj.encrypt())[:100], '\n')
@@ -137,16 +142,29 @@ if __name__ == '__main__':
 
     # obj = Vigenere(enc)
     # obj.crack()
-
-
+    # -------------------------------
+    
+    # Read ciphertext to crack
     ciphertext = ciphertext_f.read()
-    
+
+    # Create object
     ve_obj = Vigenere(ciphertext)
-    key = ve_obj.crack()
+
+    # Show idecies of conformity sorted descending
+    ve_obj.count_indicies()
     
-    # print('боаяамахчэндшпиль')
-    # ve_obj = Vigenere(ciphertext, key='боаяамахчэндшпиль')
-    # print(ve_obj.decrypt())
+    # Get cracked (or almost cracked key)
+    key = ve_obj.crack(17)
+    print(key)
+
+    # Recreate our ve_obj with key to decipher text
+    ve_obj = Vigenere(ciphertext, key='войнамагаэндшпиль')
+    
+    # Print 100 decrypted characters and save all output to file
+    print((decrypted_text := ve_obj.decrypt())[:100])
+    with open('./cp_2/kozachok-fb82_kuznetsov-fb82_cp_2/decrypted_text.txt', 'w') as f:
+        f.write(decrypted_text)
+
     
 
 
