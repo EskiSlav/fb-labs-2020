@@ -7,12 +7,28 @@ sh = logging.StreamHandler(stdout)
 fh = logging.FileHandler('report.txt', 'w') 
 logging.basicConfig(level=logging.INFO, format="%(message)s", handlers=(sh, fh))
 
-ciphertext_f = open('./cp_2/kozachok-fb82_kuznetsov-fb82_cp_2/ciphertext.txt', 'r')
-ciphertext_v10_f = open('./cp_2/kozachok-fb82_kuznetsov-fb82_cp_2/ciphertext_v10.txt', 'r')
-
 most_used_letters = [ 'о','е','а','н','и','т','с','л','в','р','к','д','м','у','п','я','ь','ы','г','б','ч','з','ж','й','ш','х','ю','э','щ','ц','ф','ъ','ё']
-myopentext_f = open('./cp_2/kozachok-fb82_kuznetsov-fb82_cp_2/myopentext.txt', 'r')
+ciphertext_f = open('./cp_2/kozachok-fb82_kuznetsov-fb82_cp_2/ciphertext.txt', 'r')
 myopentext_anna_f = open('./cp_2/kozachok-fb82_kuznetsov-fb82_cp_2/anna.txt', 'r')
+myopentext_anna_begining_f = open('./cp_2/kozachok-fb82_kuznetsov-fb82_cp_2/anna_begining.txt')
+
+keys_different_length = [
+    "ку",                   #2
+    "мда",                  #3
+    "мама",                 #4
+    "арбат",                #5
+    "приветкотя",           #10
+    "анатолийдед",          #11
+    "светочеймоих",         #12
+    "велосипедвага",        #13
+    "моршинскаявода",       #14
+    "макбукпрокрутой",      #15
+    "работатьмневкайф",     #16
+    "силаджедаявагабун",    #17
+    "ноутбукисиладжедая",   #18
+    "читаймеждустрокбрат",  #19
+    "строкинестрокибезума"  #20
+]
 
 class Vigenere():
 
@@ -92,9 +108,10 @@ class Vigenere():
 
         return self.__proc_text('d')
 
-    def count_indicies(self) -> None:
+    def count_indicies(self) -> str:
+        "Returns string for excel table"
         Indices = {}
-        
+        s = ""
         # Подсчёт индексов
         for r in range(2, 35):
             Y =  self.text[::r] 
@@ -106,10 +123,11 @@ class Vigenere():
             I = summ / (l * (l - 1))
             Indices[r] = I
 
-        sIndices = sorted(list(Indices.items()), key=lambda x: x[1], reverse=True)
+        sIndices = sorted(list(Indices.items()), key=lambda x: x[0], reverse=True)
         for r, I in sIndices:
             print("Key length: {r}, Index: {I:3>}".format(r=r, I=str(I)) )
-
+            s += "{r}\t{I:3>}\n".format(r=r, I=str(I))
+        return s
 
 
     def crack(self, key_len: int) -> str:
@@ -131,19 +149,8 @@ class Vigenere():
         logging.info("Pass more text to get more accurate result")
 
         
-if __name__ == '__main__':
-
-    # --- TEST WITH ANNA KARENINA ---
-    # plaintext = myopentext_anna_f.read()
-    # obj = Vigenere(plaintext, key="приветмир")
-    # print( (enc:=obj.encrypt())[:100], '\n')
-    # obj = Vigenere(enc, key="приветмир")
-    # print("DECRYPTION...\n", obj.decrypt()[:100])
-
-    # obj = Vigenere(enc)
-    # obj.crack()
-    # -------------------------------
-    
+def crack_variant_9():
+     
     # Read ciphertext to crack
     ciphertext = ciphertext_f.read()
 
@@ -164,6 +171,26 @@ if __name__ == '__main__':
     print((decrypted_text := ve_obj.decrypt())[:100])
     with open('./cp_2/kozachok-fb82_kuznetsov-fb82_cp_2/decrypted_text.txt', 'w') as f:
         f.write(decrypted_text)
+
+def encrypt_and_count_indecies():
+    # --- TEST WITH ANNA KARENINA ---
+    plaintext = myopentext_anna_begining_f.read()
+    # with open("./cp_2/kozachok-fb82_kuznetsov-fb82_cp_2/report.txt", 'w') as f: pass
+    for key in keys_different_length:
+        report_file = open("./cp_2/kozachok-fb82_kuznetsov-fb82_cp_2/report_{}.txt".format(len(key)), 'w')
+        print(' --- Key: {}'.format(key))
+        obj = Vigenere(plaintext, key=key)
+        # print( (enc:=obj.encrypt())[:100], '\n')
+        obj = Vigenere(obj.encrypt())
+        report_file.write(key + '\n')
+        report_file.write(obj.count_indicies().replace('.', ','))
+
+if __name__ == '__main__':
+
+    encrypt_and_count_indecies()
+
+    # crack_variant_9()
+   
 
     
 
