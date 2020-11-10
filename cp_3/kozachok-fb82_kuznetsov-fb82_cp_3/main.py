@@ -197,6 +197,7 @@ def break_ciphertext(ciphertext: str, print_rejected: bool=True) -> None:
                         
 
 if __name__ == '__main__':
-    text = cs.open(ciphertext_filename, "r", encoding='utf-8').read()
+    with cs.open(ciphertext_filename, "r", encoding='utf-8') as f
+        text = f.read()
     print_debug = input('Print rejected text? (y/n): ')
     break_ciphertext(text, True if print_debug.lower() == 'y' else False)
