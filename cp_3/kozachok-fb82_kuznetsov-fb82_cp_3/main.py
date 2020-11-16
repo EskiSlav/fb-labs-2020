@@ -63,7 +63,9 @@ def bigram_counter(line: str):
         letter_counter += 1
 
     tupleList = sorted(bigrams.items(), key=lambda i: i[1], reverse=True)
-
+    for bi, n in tupleList:
+        print("{}\t{}".format(bi, n))
+        
     # Return list of bigrams sorted by descending frequency
     return [ item[0] for item in tupleList]
 
