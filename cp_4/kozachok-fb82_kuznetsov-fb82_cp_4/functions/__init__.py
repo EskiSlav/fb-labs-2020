@@ -80,14 +80,17 @@ def gen_prime_number(bits: int) -> int:
     logging.debug(f"{len(bits_str)=}\n{bits_str=}")
 
     n = int(bits_str, 2)
-    
-    for num in range(n, n*2 - 1):
+
+    if n % 2 == 0:
+        n += 1
+
+    for num in range(n, n*2 - 1, 2):
         if miller_rabin_test(num):
             prime = num
-            logging.info("[*] Prime number {}".format(prime))
+            logging.info("[*] Prime number {}".format(hex(prime)))
             break
         else:
-            logging.debug('[*] Number {} is not prime'.format(num))
+            logging.debug('[*] Number {} is not prime'.format(hex(num)))
 
     return num
 

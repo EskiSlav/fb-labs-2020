@@ -7,11 +7,39 @@ from functions.jacobi import JacobiSymbol
 
 sh = logging.StreamHandler(stdout)
 fh = logging.FileHandler('report.txt', 'w') 
-logging.basicConfig(level=logging.INFO, format="%(message)s", handlers=(sh, fh))
+logging.basicConfig(level=logging.DEBUG, format="%(message)s", handlers=(sh, fh))
 
 
-if __name__ == '__main__':
 
+def test_with_server_key():
+    server_modulus_str = '0x9F7C062AF66FE39A065A57AA6826EE45CE350953725EAEB1A6EFCC44E534B8AB'
+    signed_message_str = '0x1D2F016E33204AAEB83516A8A314B43EA8A507E6976F7267F5DCE55DB537DC7D'
+    e = 0x10001
+    message = 0x1111
+    server_modulus = int(server_modulus_str, 16)
+    signed_message = int(signed_message_str, 16)
+    print(hex(encrypt(message, e, server_modulus))[2:])
+    print(verify(0x1234, signed_message, e, server_modulus))
+
+def test_verification():
+    server_modulus_str = '0x9F7C062AF66FE39A065A57AA6826EE45CE350953725EAEB1A6EFCC44E534B8AB'
+    signed_message_str = '0x1D2F016E33204AAEB83516A8A314B43EA8A507E6976F7267F5DCE55DB537DC7D'
+    e = 0x10001
+    message = 0x1234
+    server_modulus = int(server_modulus_str, 16)
+    signed_message = int(signed_message_str, 16)
+    print(verify(message, signed_message, e, server_modulus))
+
+def test_send_key():  
+    server_modulus_str = '0x9F7C062AF66FE39A065A57AA6826EE45CE350953725EAEB1A6EFCC44E534B8AB'
+    e, d, n = gen_key_pair(64) 
+    e1 = 0x10001
+    message = 0x1234
+    server_modulus = int(server_modulus_str, 16)
+    k1, s1 = send_key(message, d, n, e1, server_modulus)
+    print (hex(k1) + '\n' + hex(s1))
+
+def main():
     bits_len = 256
     e, d, n = gen_key_pair(bits_len)
     
@@ -44,3 +72,8 @@ if __name__ == '__main__':
     else:
         logging.info("[X] Not verified!")
 
+
+
+if __name__ == '__main__':
+    # test_verification()    
+    test_send_key()
